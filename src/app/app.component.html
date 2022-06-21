@@ -1,0 +1,11 @@
+<div class="main-spacing">
+  <!-- Navegación principal en base de enrutador -->
+  <ul *ngIf="showNav" ngbNav [activeId]="currentUrl" class="nav-tabs">
+    <li [ngbNavItem]="link.url" *ngFor="let link of links">
+      <a ngbNavLink [routerLink]="[link.url]" >{{ link.title }}</a>
+    </li>
+  </ul>
+
+  <!-- enrutador -->
+  <router-outlet></router-outlet>
+</div>

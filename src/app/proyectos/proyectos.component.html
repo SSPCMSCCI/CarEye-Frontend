@@ -1,0 +1,170 @@
+<div class="global-page-spacing">
+    <form>
+        <div class="form-group form-inline">
+            {{!newProyectView && !editProjectView ? 'Buscar' : ''}} <input *ngIf="(newProyectView == false && editProjectView == false)"
+                class="form-control ml-2" type="text" [formControl]="filter" />
+
+            <label style="margin-left: 50px; background-color: rgb(9, 8, 102); border-color: rgb(9, 8, 102);"
+                class="btn-primary" (click)="newProyect()" ngbButtonLabel>
+                {{newProyectView || editProjectView ? 'Volver' : 'Nuevo'}}
+            </label>
+        </div>
+    </form>
+
+    <table *ngIf="(newProyectView == false && editProjectView == false)" class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Estado</th>
+                <th scope="col">Código</th>
+                <th scope="col">Estado de despliegue</th>
+                <th scope="col">Fecha de despliegue</th>
+                <th scope="col">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let project of projects$; index as i">
+                <td>
+                    <ngb-highlight [result]="project.estado" [term]="filter.value"></ngb-highlight>
+                </td>
+                <td style="cursor: pointer;" (click)="projectDetail(project.id!)">
+                    <a href="javascript:void(0);">
+                        <ngb-highlight [result]="project.codigo" [term]="filter.value"></ngb-highlight>
+                    </a>
+                </td>
+                <td>
+                    <ngb-highlight [result]="project.deploymentState" [term]="filter.value"></ngb-highlight>
+                </td>
+                <td>
+                    <ngb-highlight [result]="project.ultimoDespliegue!.toString()" [term]="filter.value"></ngb-highlight>
+                </td>
+                <td>
+                    <button style="width: 40%;" type="button" class="btn btn-warning" ngbTooltip="Editar Proyecto" (click)="editProject(project)">
+                        <fa-icon [icon]="faEdit"></fa-icon>
+                    </button>
+                    <button style="width: 40%;" type="button" class="btn btn-danger float-right" ngbTooltip="Eliminar Proyecto"
+                        (click)="deleteProject(project)">
+                        <fa-icon [icon]="faTrashAlt"></fa-icon>
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+<!--Crear/Editar-->
+    <div *ngIf="newProyectView || editProjectView" style="width: 100%;" class="d-flex justify-content-center">
+        <div style="width: 70%;">
+            <p *ngIf="newProyectView || editProjectView" class="align-middle"
+                style="font-size: 20px; color: rgb(9, 8, 102); font-weight: bold;"><span>{{editProjectView ? 'Editar' :
+                    'Nuevo'}} Proyecto</span>
+            </p>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend" style="width: 20%;">
+                    <span style="width: 100%;" class="input-group-text" id="basic-addon1">Código de Proyecto</span>
+                </div>
+                <input type="text" required class="form-control" [(ngModel)]="codigo" #codigoP="ngModel" placeholder="Código"
+                    aria-label="Código de Proyecto" aria-describedby="basic-addon1">
+                <div *ngIf="codigoP.invalid && (codigoP.dirty||codigoP.touched||!esValido)" style="color: red;margin: 5px;">
+                    <div *ngIf="codigoP.errors?.required">
+                    Completar el campo solicitado
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group mb-3">
+                <div class="input-group-prepend" style="width: 20%;">
+                    <span style="width: 100%;" class="input-group-text" id="basic-addon1">Nombre de Proyecto</span>
+                </div>
+                <input type="text" required class="form-control" [(ngModel)]="nombre" placeholder="Nombre"
+                    aria-label="Nombre de Proyecto" aria-describedby="basic-addon1" #nombreP="ngModel">
+                <div *ngIf="nombreP.invalid && (nombreP.dirty||nombreP.touched||!esValido)" style="color: red;margin: 5px;">
+                    <div *ngIf="nombreP.errors?.required">
+                    Completar el campo solicitado
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group mb-3">
+                <div class="input-group-prepend" style="width: 20%;">
+                    <span style="width: 100%;" class="input-group-text" id="basic-addon1">Repositorio</span>
+                </div>
+                <input type="text" rquired class="form-control" [(ngModel)]="repositorio" placeholder="Repositorio"
+                    aria-label="Repositorio" aria-describedby="basic-addon1" #repoP="ngModel">
+                <div *ngIf="repoP.invalid && (repoP.dirty||repoP.touched||!esValido)" style="color: red;margin: 5px;">
+                    <div *ngIf="repoP.errors?.required">
+                    Completar el campo solicitado
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group mb-3">
+                <div class="input-group-prepend" style="width: 20%;">
+                    <span style="width: 100%;" class="input-group-text" id="basic-addon1">Estado</span>
+                </div>
+                <select [(ngModel)]="estado" required aria-label="Estado" aria-describedby="basic-addon1" #estadoP="ngModel">
+                    <option *ngFor="let state of states" [ngValue]="state" >{{state}}</option>
+                </select>
+                <div *ngIf="estadoP.invalid && (estadoP.dirty||estadoP.touched||!esValido)" style="color: red;margin: 5px;">
+                    <div *ngIf="estadoP.errors?.required">
+                    Completar el campo solicitado
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group mb-3">
+                <div class="input-group-prepend" style="width: 20%;">
+                    <span style="width: 100%;" class="input-group-text" id="basic-addon1">Tecnologia</span>
+                </div>
+                <select [(ngModel)]="tecnologia" required aria-label="Tecnologia" aria-describedby="basic-addon1"  #tecP="ngModel">
+                    <option *ngFor="let tech of technologies" [ngValue]="tech">{{tech}}</option>
+                </select>
+                <div *ngIf="tecP.invalid && (tecP.dirty||tecP.touched||!esValido)" style="color: red;margin: 5px;">
+                    <div *ngIf="tecP.errors?.required">
+                    Completar el campo solicitado
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group mb-3">
+                <div class="input-group-prepend" style="width: 20%;">
+                    <span style="width: 100%;" class="input-group-text" id="basic-addon1">Tipo</span>
+                </div>
+                <select [(ngModel)]="tipo" required aria-label="Tipo" aria-describedby="basic-addon1" #tipoP="ngModel">
+                    <option *ngFor="let type of types" [ngValue]="type" >{{type}}</option>
+                </select>
+                <div *ngIf="tipoP.invalid && (tipoP.dirty||tipoP.touched||!esValido)" style="color: red;margin: 5px;">
+                    <div *ngIf="tipoP.errors?.required">
+                    Completar el campo solicitado
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group mb-3">
+                <div class="input-group-prepend" style="width: 20%;">
+                    <span style="width: 100%;" class="input-group-text" id="basic-addon1">Jefes de Proyecto</span>
+                </div>
+                <input type="text" class="form-control" [(ngModel)]="pmTempName" placeholder="Jefes de Proyecto"
+                    aria-label="Jefes de Proyecto" aria-describedby="basic-addon1">
+                <div *ngIf="(!esValido)&& (managers.length <= 0)" style="color: red;margin: 5px;">
+                    Completar el campo solicitado
+                </div>
+
+                <div class="input-group-append" style="width: 10%;">
+                    <button style="width: 100%;" type="button" class="btn btn-success"
+                        (click)="addProjectManager()">Añadir</button>
+                </div>
+            </div>
+            <ul class="list-group" style="width: 50%;">
+                <li class="list-group-item align-middle" *ngFor="let pm of managers; index as i">{{pm}} <button
+                        style="width: 50px;" type="button" class="btn btn-danger float-right"
+                        (click)="deleteProjectManager(pm)">
+                        <fa-icon [icon]="faTrashAlt"></fa-icon>
+                    </button></li>
+            </ul>
+
+            <div class="input-group mb-3" style="margin-top: 40px;">
+                <button style="width: 100%; background-color: rgb(9, 8, 102); border-color: rgb(9, 8, 102);"
+                    type="button" class="btn btn-success"
+                    (click)="editProjectView ? saveProject(true) : saveProject()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>

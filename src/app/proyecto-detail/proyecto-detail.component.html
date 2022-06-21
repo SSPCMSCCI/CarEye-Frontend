@@ -1,0 +1,148 @@
+<div class="global-page-spacing">
+    <div *ngIf="!noProject">
+        <div style="margin-left: 20px; margin-bottom: 35px;">
+            <p style="font-size: 35px; color: rgb(9, 8, 102); font-weight: 700;">
+                <fa-icon [icon]="faChevronLeft" (click)="goBack()" style="cursor: pointer; margin-right: 55px;">
+                </fa-icon>
+                <fa-icon [icon]="faArchive" style="margin-right: 15px;"></fa-icon> {{project?.nombre}}
+            </p>
+        </div>
+        <nav ngbNav #nav="ngbNav" class="nav-tabs">
+            <ng-container ngbNavItem>
+                <a ngbNavLink>Resumen</a>
+                <ng-template ngbNavContent>
+                    <div style="margin: 30px;">
+                        <div
+                            style="width: 300px; border: 0.5px solid rgb(226, 217, 217); border-radius: 10px; float: left;">
+                            <div class="inf_general" style="height: 60px;">
+                                <div style="padding-top: 15px; padding-bottom: 15px; padding-left: 15px;">
+                                    <p style="font-size: 18px; color: rgb(9, 8, 102); font-weight: bold;">Información
+                                        general</p>
+                                </div>
+                            </div>
+                            <div style="width: 100%; border-bottom: 0.5px solid rgb(226, 217, 217);">
+                                <div style="padding-top: 15px; padding-bottom: 15px; padding-left: 15px;">
+                                    <p style="font-size: 15px; color: rgb(9, 8, 102); font-weight: 500;">
+                                        <fa-icon [icon]="faUsers" style="margin-right: 15px;"></fa-icon> Jefes de
+                                        proyecto
+                                    </p>
+                                    <ul>
+                                        <li *ngFor="let pm of project?.managers">
+                                            <p style="font-size: 14px; color: rgb(9, 8, 102);">{{ pm }}</p>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div style="height: 100px; width: 100%; border-bottom: 0.5px solid rgb(226, 217, 217);">
+                                <div style="padding-top: 15px; padding-bottom: 15px; padding-left: 15px;">
+                                    <p style="font-size: 15px; color: rgb(9, 8, 102); font-weight: 500;">
+                                        <fa-icon [icon]="faRocket" style="margin-right: 15px;"></fa-icon> Último
+                                        despliegue
+                                    </p>
+                                    <p style="font-size: 14px; color: rgb(9, 8, 102);">{{ project?.ultimoDespliegue! }}</p>
+                                </div>
+                            </div>
+                            <div style="height: 100px; width: 100%;">
+                                <div style="padding-top: 15px; padding-bottom: 15px; padding-left: 15px;">
+                                    <p style="font-size: 15px; color: rgb(9, 8, 102); font-weight: 500;">
+                                        <fa-icon [icon]="faCodeBranch" style="margin-right: 15px;"></fa-icon>
+                                        Repositorio
+                                    </p>
+                                    <p style="font-size: 14px; color: rgb(9, 8, 102);">{{ project?.repositorio }}</p>
+                                    <label *ngIf="project?.deploymentState=='No Desplegado'" style="margin-left: 50px; background-color: rgb(9, 8, 102); border-color: rgb(9, 8, 102);"
+                                    class="btn-primary" (click)="desplegarProyecto()" ngbButtonLabel>
+                                    Desplegar
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div ngbDropdown class="d-inline-block" style="float: left;margin: 100px 70px 100px 70px;">
+                            <button style="font-weight: 500;color: rgb(9, 8, 102); border-color: rgb(9, 8, 102);"
+                                class="btn btn-outline-primary" id="dropdownBasic1" ngbDropdownToggle>{{metrica}}</button>
+                                
+                            <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+                                <button ngbDropdownItem *ngFor="let met of listaMetricas" (click)="selectMetrica(met)">{{met}}</button>
+                            </div>
+                        </div>
+                        <button style="font-weight: 500;color: rgb(9, 8, 102); border-color: rgb(9, 8, 102);"
+                                class="btn btn-outline-primary" id="btnHoras" (click)="changeTimeFrame('lastHora')">Ultima Hora</button>
+                        <button style="font-weight: 500;color: rgb(9, 8, 102); border-color: rgb(9, 8, 102);"
+                                class="btn btn-outline-primary" id="btnDias" (click)="changeTimeFrame('lastDia')">Ultimo Día</button>
+                        <button style="font-weight: 500;color: rgb(9, 8, 102); border-color: rgb(9, 8, 102);"
+                                class="btn btn-outline-primary" id="btnSemana" (click)="changeTimeFrame('lastSemana')">Ultima Semana</button>
+                        <button style="font-weight: 500;color: rgb(9, 8, 102); border-color: rgb(9, 8, 102);"
+                                class="btn btn-outline-primary" id="btnMes" (click)="changeTimeFrame('lastMes')">Ultimo Mes</button>
+
+                        <div style="width: 60%; float: left" echarts [options]="options" class="demo-chart"></div>
+                    </div>
+                </ng-template>
+            </ng-container>
+            <ng-container ngbNavItem>
+                <a ngbNavLink>Logs</a>
+                <ng-template ngbNavContent>
+                    <div style="margin: 30px;">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Hora Incidencia</th>
+                                    <th scope="col">Mensaje</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="cursor: pointer;" *ngFor="let event of msjLogs; index as i">
+                                    <td>
+                                        <ngb-highlight [result]="event.horaOcurrencia.toString()"></ngb-highlight>
+                                    </td>
+                                    <td>
+                                        <ngb-highlight [result]="event.mensaje"></ngb-highlight>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </ng-template>
+            </ng-container>
+            <ng-container ngbNavItem>
+                <a ngbNavLink>Costos</a>
+                <ng-template ngbNavContent>
+                    <div style="margin: 30px;">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Servicio</th>
+                                    <th scope="col">Costo unitario</th>
+                                    <th scope="col">Costo Mensual Aproximado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="cursor: pointer;" *ngFor="let cost of precios; index as i">
+                                    <td>
+                                        <ngb-highlight [result]="cost.nombre"></ngb-highlight>
+                                    </td>
+                                    <td>
+                                        <ngb-highlight [result]="'$' + (cost.usd|number:'1.0-5')+ ' /' + cost.unidad"></ngb-highlight>
+                                    </td>
+                                    <td>
+                                        <ngb-highlight [result]="'$'+(cost.monthAprox|number:'1.0-5')"></ngb-highlight>
+                                    </td>
+                                </tr>
+                                <tr style="cursor: pointer;">
+                                    <td colspan="2">Total</td>
+                                    <td>${{sumMonth()|number:'1.0-5'}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </ng-template>
+            </ng-container>
+        </nav>
+
+        <div [ngbNavOutlet]="nav" class="mt-2"></div>
+    </div>
+    <div *ngIf="noProject" style="text-align: center;">
+        <h1>
+            No se encontró el proyecto.
+        </h1>
+    </div>
+</div>
